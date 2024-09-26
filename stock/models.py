@@ -30,7 +30,7 @@ class DateTimeModel(models.Model):
 
 
 class Stock(DateTimeModel):
-    symbol = models.CharField(max_length=10,unique=True)
+    symbol = models.CharField(max_length=10,unique=True,db_index=True)
     ltp = models.DecimalField(max_digits=10, decimal_places=2)
     point_change = models.DecimalField(max_digits=10, decimal_places=2)
     percentage_change = models.DecimalField(max_digits=10, decimal_places=2)
