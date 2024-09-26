@@ -5,7 +5,8 @@ from .models import Stock
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
-        fields = "__all__"
+        exclude = ["created_at","updated_at","deleted_at"]
+
 
 
     
