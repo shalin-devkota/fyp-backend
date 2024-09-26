@@ -8,6 +8,11 @@ import random
 import json
 import os
 
+"""
+SITES LEFT TO SCRAPE FROM:
+1)NEPALI PAISA (API)
+
+"""
 
 with open("sectors.json", "r") as json_file:
     sectors = json.load(json_file)
