@@ -19,7 +19,7 @@ class GetUserFromJWT(APIView):
         user_queryset = CustomUser.objects.filter(id=token_obj["user_id"])
         if not user_queryset.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        user = user_queryset.values("name", "email", "is_staff", "is_mod").first()
+        user = user_queryset.values("fullname", "email", "is_staff", "is_mod").first()
         serializer = UserLoginSerializer(user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

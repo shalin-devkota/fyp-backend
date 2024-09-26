@@ -4,6 +4,7 @@ from stock.models import Stock
 from django.core.management.base import BaseCommand
 from decimal import Decimal, InvalidOperation
 from django.core.exceptions import ValidationError
+import random
 
 
 class Command(BaseCommand):
@@ -15,7 +16,7 @@ class Command(BaseCommand):
         except InvalidOperation:
             return None
 
-    # Function to safely convert to int
+   
     def safe_int(self,value):
         try:
             return int(float(value.replace(",", "")))
@@ -80,70 +81,6 @@ class Command(BaseCommand):
                         )
                     )
 
-    def merolagani_scraper(self): #Weird JS render going on here. Maybe i will do later maybe not dont know
-        stocks = []
-        base_url = "https://merolagani.com/LatestMarket.aspx"
-
-        data_html = requests.get(base_url)
-        data_soup = soup(data_html.text, "html.parser")
-        table = data_soup.find(
-            "div", {"id": "ctl00_ContentPlaceHolder1_LiveTrading"}
-        ).find("table")
-        field_names = [
-            "symbol",
-            "ltp",
-            "percentage_change",
-            "open",
-            "high",
-            "low",
-            "volume",
-            "prev_close",
-            "point_change",
-        ]
-
-        for row in table.find_all("tr")[1:]:  # Skip the header row
-            cells = row.find_all("td")
-            print(cells)
-            break
-        
-            stock_data = {
-                field: cells[i].text.strip() for i, field in enumerate(field_names)
-            }
-            print(stock_data)
-            break
-            # Function to safely convert to Decimal
-            # def safe_decimal(value):
-            #     try:
-            #         return Decimal(value.replace(',', ''))
-            #     except InvalidOperation:
-            #         return None
-
-            # # Function to safely convert to int
-            # def safe_int(value):
-            #     try:
-            #         return int(float(value.replace(',', '')))
-            #     except ValueError:
-            #         return None
-
-            # try:
-            #     Stock.objects.update_or_create(
-            #         symbol=stock_data['symbol'],
-            #         defaults={
-            #             'ltp': safe_decimal(stock_data['ltp']),
-            #             'point_change': safe_decimal(stock_data['point_change']),
-            #             'percentage_change': safe_decimal(stock_data['percentage_change']),
-            #             'open_price': safe_decimal(stock_data['open']),
-            #             'high_price': safe_decimal(stock_data['high']),
-            #             'low_price': safe_decimal(stock_data['low']),
-            #             'volume': safe_int(stock_data['volume']),
-            #             'prev_close': safe_decimal(stock_data['prev_close'])
-            #         }
-            #     )
-            #     stocks.append(stock_data)
-            # except ValidationError as e:
-            #     self.stdout.write(self.style.ERROR(f"Error processing stock {stock_data['symbol']}: {str(e)}"))
-
-
     def chukul_scraper(self):
         base_url = 'https://chukul.com/api/data/v2/market-summary/?type=stock'
         data = requests.get(base_url).json()
@@ -172,5 +109,8 @@ class Command(BaseCommand):
                     )
                 )
 
+
     def handle(self, *args, **options):
-        self.chukul_scraper()
+        self.nepsealpha_scraper()
+
+    
