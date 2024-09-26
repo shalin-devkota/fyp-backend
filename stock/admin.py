@@ -1,4 +1,7 @@
 from django.contrib import admin
-from .models import Stock
-# Register your models here.
-admin.site.register(Stock)
+from django.apps import apps
+
+app = apps.get_app_config('stock')
+
+for model_name, model in app.models.items():
+    admin.site.register(model)
