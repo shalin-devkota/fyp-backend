@@ -22,6 +22,8 @@ urlpatterns = [
     path('auth/',include('djoser.urls.jwt')),
     path('user/',include('user.urls')),
     path('stocks/',include('stock.urls')),
+    path("portfolio/",include('portfolio.urls')),
+    path("trading/",include('trading.urls')),
 
 ]
 
