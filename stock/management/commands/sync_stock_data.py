@@ -5,7 +5,19 @@ from django.core.management.base import BaseCommand
 from decimal import Decimal, InvalidOperation
 from django.core.exceptions import ValidationError
 import random
+import json
+import os
 
+
+with open("sectors.json", "r") as json_file:
+    sectors = json.load(json_file)
+
+stock_sector_map = dict()
+
+for sector, symbols in sectors.items():
+    for symbol in symbols:
+        stock_sector_map[symbol] = sector
+    
 
 class Command(BaseCommand):
     help = "fix the description images"
@@ -24,7 +36,7 @@ class Command(BaseCommand):
             return None
 
 
-    def get_stock_data(self):
+    def sharesansar_scraper(self):
         stocks = []
         base_url = "https://www.sharesansar.com/live-trading"
 
@@ -71,6 +83,7 @@ class Command(BaseCommand):
                             "low_price": self.safe_decimal(stock_data["low"]),
                             "volume": self.safe_int(stock_data["volume"]),
                             "prev_close": self.safe_decimal(stock_data["prev_close"]),
+                            "sector": stock_sector_map.get(stock_data["symbol"], "N/A"),
                         },
                     )
                     stocks.append(stock_data)
@@ -111,6 +124,6 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        self.nepsealpha_scraper()
+        self.sharesansar_scraper()
 
     
