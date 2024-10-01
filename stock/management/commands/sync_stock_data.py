@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 import random
 import json
 import os
+from django.utils import timezone
 
 """
 SITES LEFT TO SCRAPE FROM:
@@ -22,6 +23,8 @@ stock_sector_map = dict()
 for sector, symbols in sectors.items():
     for symbol in symbols:
         stock_sector_map[symbol] = sector
+    
+
     
 
 class Command(BaseCommand):
@@ -75,8 +78,10 @@ class Command(BaseCommand):
                 
 
                 try:
+                 
                     Stock.objects.update_or_create(
                         symbol=stock_data["symbol"],
+                        date = timezone.now().date(),
                         defaults={
                             "ltp": self.safe_decimal(stock_data["ltp"]),
                             "point_change": self.safe_decimal(stock_data["point_change"]),
@@ -88,7 +93,7 @@ class Command(BaseCommand):
                             "low_price": self.safe_decimal(stock_data["low"]),
                             "volume": self.safe_int(stock_data["volume"]),
                             "prev_close": self.safe_decimal(stock_data["prev_close"]),
-                            "sector": stock_sector_map.get(stock_data["symbol"], "N/A"),
+                            "sector": (stock_sector_map.get(stock_data["symbol"].upper(), "N/A")).upper(),
                         },
                     )
                     stocks.append(stock_data)

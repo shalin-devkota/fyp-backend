@@ -28,9 +28,11 @@ class DateTimeModel(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        abstract = True
 
 class Stock(DateTimeModel):
-    symbol = models.CharField(max_length=10,unique=True,db_index=True)
+    symbol = models.CharField(max_length=10,db_index=True)
     ltp = models.DecimalField(max_digits=10, decimal_places=2)
     point_change = models.DecimalField(max_digits=10, decimal_places=2)
     percentage_change = models.DecimalField(max_digits=10, decimal_places=2)
@@ -40,11 +42,15 @@ class Stock(DateTimeModel):
     volume = models.IntegerField()
     prev_close = models.DecimalField(max_digits=10, decimal_places=2)
     sector = models.CharField(max_length=200,choices=SECTOR_CHOICES,null=True,blank=True)
+    date = models.DateField(null=True,blank=True) 
 
 
     def __str__(self):
         return self.symbol
-    
+
+    class Meta:
+        unique_together = ['symbol','date']
+
 class PortfolioStock(DateTimeModel):
     symbol = models.ForeignKey(Stock,on_delete=models.CASCADE)
     quantity = models.IntegerField()
