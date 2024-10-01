@@ -12,6 +12,7 @@ from  rest_framework import status
 from django.utils import timezone
 class ListStock(ListAPIView):
     serializer_class = StockSerializer
+    pagination_class = None
     
     def get_queryset(self):
         today = timezone.now().date()
@@ -24,10 +25,12 @@ class StockDetail(APIView):
     serializer_class = StockSerializer
     
     def get(self, request, *args, **kwargs):
-    
-        year = request.query_params.get("year")
-        month = request.query_params.get("month")
+
+        year = request.GET.get("year")
+        month = request.GET.get("month")
+
         symbol = kwargs.get("symbol")
+        
         stock_history = dict()
         if not year or not month:
             raise ParseError("Both 'year' and 'month' must be provided.")

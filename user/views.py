@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from .serializers import UserLoginSerializer
-
+from .serializers import UserLoginSerializer, UserTransactionSerializer
+from rest_framework.generics import ListAPIView
+from trading.models import Transaction
 # Create your views here.
 
 class GetUserFromJWT(APIView):
@@ -23,3 +24,9 @@ class GetUserFromJWT(APIView):
         serializer = UserLoginSerializer(user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserTransactions(ListAPIView):
+    serializer_class = UserTransactionSerializer
+    def get_queryset(self):
+        user = self.request.user
+        return Transaction.objects.filter(user=user)
