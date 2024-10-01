@@ -23,10 +23,10 @@ class ListStock(ListAPIView):
 class StockDetail(APIView):
     serializer_class = StockSerializer
     
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
     
-        year = request.data.get("year")
-        month = request.data.get("month")
+        year = request.query_params.get("year")
+        month = request.query_params.get("month")
         symbol = kwargs.get("symbol")
         stock_history = dict()
         if not year or not month:
