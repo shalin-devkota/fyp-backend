@@ -25,9 +25,10 @@ class StockDetail(APIView):
     serializer_class = StockSerializer
     
     def get(self, request, *args, **kwargs):
-    
+
         year = request.GET.get("year")
         month = request.GET.get("month")
+
         symbol = kwargs.get("symbol")
         
         stock_history = dict()
