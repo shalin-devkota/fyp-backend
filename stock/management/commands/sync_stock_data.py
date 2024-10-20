@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
         table = data_soup.find("table", {"id": "headFixed"})
 
-        # Define the order of the fields
+     
         field_names = [
             "id",
             "symbol",
@@ -67,15 +67,12 @@ class Command(BaseCommand):
             "prev_close",
         ]
 
-        for row in table.find_all("tr")[1:]:  # Skip the header row
+        for row in table.find_all("tr")[1:]:
             cells = row.find_all("td")
-            if len(cells) == len(field_names):  # Ensure there are enough cells
+            if len(cells) == len(field_names):  
                 stock_data = {
                     field: cells[i].text.strip() for i, field in enumerate(field_names)
                 }
-
-                # Function to safely convert to Decimal
-                
 
                 try:
                  
