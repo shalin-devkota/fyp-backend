@@ -30,3 +30,22 @@ class UserTransactions(ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Transaction.objects.filter(user=user)
+    
+class LoadFunds(APIView):
+    def post(self,request,*args,**kwargs):
+        amount = request.data.get("amount")
+        if not amount:
+            return Response({"error": "Amount is required."}, status=400)
+        try:
+            user = request.user
+            user.available_funds += int(amount)
+            user.save()
+            return Response({"message": "Funds loaded successfully."}, status=201)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+        
+class GetFunds(APIView):
+    def get(self,request,*args,**kwargs):
+        user = request.user
+        return Response({"funds": user.available_funds}, status=200)
+    
