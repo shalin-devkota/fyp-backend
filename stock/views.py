@@ -46,7 +46,7 @@ class StockDetail(APIView):
             stock_history[x["date"]] = {"open": x["open_price"], "close": x["ltp"], "low": x["low_price"], "high": x["high_price"]}
         data = {
             "symbol": symbol,
-            "number_of_stocks": 0,
+            "number_of_stocks": 5,
             "history" : stock_history
         }
         return Response(data,status=status.HTTP_200_OK)

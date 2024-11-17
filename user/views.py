@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from .serializers import UserLoginSerializer, UserTransactionSerializer
+from .serializers import UserLoginSerializer, UserTransactionSerializer, UserDashboardSerializer
 from rest_framework.generics import ListAPIView
 from trading.models import Transaction
 # Create your views here.
@@ -48,4 +48,25 @@ class GetFunds(APIView):
     def get(self,request,*args,**kwargs):
         user = request.user
         return Response({"funds": user.available_funds}, status=200)
+
+class DashboardView(APIView):
+    def get(self,request,*args,**kwargs):
+        user = request.user
+        total_portfolio_value = user.get_portfolio_value()
+        portfolio = user.user_portfolio.first()
+        top_performers = portfolio.get_top_performers()
+        worst_performers = portfolio.get_worst_performers()
+
+        recent_trades = user.get_recent_trades()
+        streak = user.get_trading_streak()
+     
+        response = UserDashboardSerializer({
+            "funds": user.available_funds,
+            "portfolio_value": total_portfolio_value,
+            "top_performers": top_performers,
+            "worst_performers": worst_performers,
+            "recent_transactions": recent_trades,
+            "streak": streak
+        })
+        return Response(response.data, status=200)
     
