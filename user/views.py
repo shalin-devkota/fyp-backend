@@ -56,7 +56,7 @@ class DashboardView(APIView):
         portfolio = user.user_portfolio.first()
         top_performers = portfolio.get_top_performers()
         worst_performers = portfolio.get_worst_performers()
-
+        profit_or_loss=portfolio.get_profit_or_loss()
         recent_trades = user.get_recent_trades()
         streak = user.get_trading_streak()
      
@@ -66,7 +66,8 @@ class DashboardView(APIView):
             "top_performers": top_performers,
             "worst_performers": worst_performers,
             "recent_transactions": recent_trades,
-            "streak": streak
+            "streak": streak,
+            "profit_or_loss": profit_or_loss
         })
         return Response(response.data, status=200)
     

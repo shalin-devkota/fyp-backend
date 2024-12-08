@@ -29,4 +29,5 @@ class UserDashboardSerializer(serializers.Serializer):
     streak=  serializers.IntegerField()
     top_performers = StockSerializer(many=True)
     worst_performers = StockSerializer(many=True)
+    profit_or_loss=  serializers.DecimalField(max_digits=10, decimal_places=2)
     

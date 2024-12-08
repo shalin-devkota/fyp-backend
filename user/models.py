@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import timedelta
+from stock.models import Stock
+from datetime import datetime
 class CustomUser(AbstractUser):
     fullname = models.CharField(max_length=200, null=True, blank=True)
     phone_number = models.CharField(max_length=10)
@@ -13,7 +15,10 @@ class CustomUser(AbstractUser):
 
     def get_portfolio_value(self):
         portfolio = self.user_portfolio.first()
-        total_value = sum([x.stock.ltp * x.quantity for x in portfolio.stocks.all()])
+        total_value = 0 
+        for stock in portfolio.stocks.all():
+            stock_obj = Stock.objects.get(symbol=stock.stock.symbol,date=datetime.today())
+            total_value += stock_obj.ltp * stock.quantity
         return total_value
     
     def get_recent_trades(self):
