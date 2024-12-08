@@ -28,6 +28,7 @@ class StockDetail(APIView):
 
         year = request.GET.get("year")
         month = request.GET.get("month")
+        portfolio = request.user.user_portfolio.first()
 
         symbol = kwargs.get("symbol")
         
@@ -46,7 +47,7 @@ class StockDetail(APIView):
             stock_history[x["date"]] = {"open": x["open_price"], "close": x["ltp"], "low": x["low_price"], "high": x["high_price"]}
         data = {
             "symbol": symbol,
-            "number_of_stocks": 5,
+            "number_of_stocks": sum([x.quantity for x in portfolio.stocks.filter(stock__symbol__iexact=symbol).all()]),
             "history" : stock_history
         }
         return Response(data,status=status.HTTP_200_OK)
