@@ -18,6 +18,7 @@ requests-html = "^0.10.0"
 django-celery-beat = "^2.7.0"
 redis = "^5.2.1"
 django-cors-headers = "^4.6.0"
+pandas = "^2.2.3"
 
 
 [build-system]
