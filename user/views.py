@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import CustomUser
+from .models import CustomUser,UserWishlistItem
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,6 +7,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from .serializers import UserLoginSerializer, UserTransactionSerializer, UserDashboardSerializer
 from rest_framework.generics import ListAPIView
 from trading.models import Transaction
+from stock.models import Stock
+from stock.serializers import StockSerializer
 # Create your views here.
 
 class GetUserFromJWT(APIView):
@@ -71,3 +73,41 @@ class DashboardView(APIView):
         })
         return Response(response.data, status=200)
     
+class WishlistStock(APIView):
+    def post(self,request,*args,**kwargs):
+        user = request.user
+        symbol = request.data.get("symbol")
+        if not symbol:
+            return Response({"error": "Stock symbol is required."}, status=400)
+        stock = Stock.objects.filter(symbol=symbol).first()
+        if not stock:
+            return Response({"error": "Stock not found."}, status=400)
+        wishlist_obj, created = UserWishlistItem.objects.get_or_create(user=user, stock=stock)
+        if not created:
+            return Response({"error": "Stock already in wishlist."}, status=400)
+        return Response({"message": "Stock added to wishlist."}, status=201)
+
+
+class GetWishList(APIView):
+    def get(self,request,*args,**kwargs):
+        wishlist_items = UserWishlistItem.objects.filter(user=request.user)
+        stocks = [item.stock for item in wishlist_items]
+        serializer = StockSerializer(stocks, many=True)
+        return Response(serializer.data)
+
+
+class RemoveFromWishlistView(APIView):
+    def delete(self, request, symbol):
+        try:
+            stock = Stock.objects.filter(symbol__iexact=symbol).first()
+            wishlist_item = UserWishlistItem.objects.get(
+                user=request.user, 
+                stock= stock
+            )
+            wishlist_item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserWishlistItem.DoesNotExist:
+            return Response(
+                {"detail": "Stock not found in wishlist"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )

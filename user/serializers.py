@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser,UserWishlistItem
 from trading.models import Transaction
 from trading.serializers import UserTransactionSerializer
 from stock.models import Stock
@@ -30,4 +30,4 @@ class UserDashboardSerializer(serializers.Serializer):
     top_performers = StockSerializer(many=True)
     worst_performers = StockSerializer(many=True)
     profit_or_loss=  serializers.DecimalField(max_digits=10, decimal_places=2)
-    
+

@@ -44,7 +44,7 @@ class StockDetail(APIView):
 
         serializer = self.serializer_class(stocks, many=True)
         for x in serializer.data:
-            stock_history[x["date"]] = {"open": x["open_price"], "close": x["ltp"], "low": x["low_price"], "high": x["high_price"]}
+            stock_history[x["date"]] = {"open": x["open_price"], "close": x["ltp"], "low": x["low_price"], "high": x["high_price"],"volume":x['volume']}
         data = {
             "symbol": symbol,
             "number_of_stocks": sum([x.quantity for x in portfolio.stocks.filter(stock__symbol__iexact=symbol).all()]),
