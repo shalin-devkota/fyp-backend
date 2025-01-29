@@ -12,14 +12,18 @@ class PredictView(APIView):
         symbol = request.query_params.get('symbol')
         request_url = f"http://localhost:5000/?symbol={symbol}"
         response = requests.get(request_url)
-        prices = [y for y in response.json().values()]
+        
+        response = response.json()
+        _ = response.pop(datetime.today().strftime('%Y-%m-%d'))
+        print(response)
+        prices = [y for y in response.values()]
         max_price = max(prices)
         min_price = min(prices)
         current_price = Stock.objects.get(symbol=symbol,date= datetime.today()).ltp
         current_price = Decimal(current_price)
         potential_gain = Decimal(max_price) - current_price
         potential_loss = current_price - Decimal(min_price)
-        risk_reward_ratio = potential_loss/potential_gain
+        
 
         mean_price = sum(prices)/len(prices)
         squared_diffs = [(price-mean_price)**2 for price in prices]
@@ -27,9 +31,11 @@ class PredictView(APIView):
 
         volatility = variance ** 0.5
 
-        threshold = float(current_price) * 0.03
+        threshold = float(current_price) * 0.01
         threshold = Decimal(threshold)
         buy_count , sell_count , hold_count = 0,0,0
+
+        risk_reward_ratio = current_price * Decimal(volatility) / 100
 
         for price in prices:
             if price> current_price + threshold:
@@ -46,7 +52,7 @@ class PredictView(APIView):
 
 
         data = {
-            "predictions": response.json(),
+            "predictions": response,
             "potential_gain": max(0,potential_gain),
             "potential_loss": max(0,potential_loss),
             "risk_reward_ratio": risk_reward_ratio,

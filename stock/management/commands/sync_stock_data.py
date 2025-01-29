@@ -29,6 +29,23 @@ for sector, symbols in sectors.items():
 
 class Command(BaseCommand):
     help = "fix the description images"
+    TRACKER_FILE = "last_scraper.txt"
+
+    def get_next_scraper(self):
+        try:
+            with open(self.TRACKER_FILE, 'r') as f:
+                last_scraper = f.read().strip()
+        except FileNotFoundError:
+            last_scraper = 'chukul'  
+
+
+        next_scraper = 'sharesansar' if last_scraper == 'chukul' else 'chukul'
+
+       
+        with open(self.TRACKER_FILE, 'w') as f:
+            f.write(next_scraper)
+
+        return next_scraper
 
     def safe_decimal(self,value):
         try:
@@ -45,6 +62,7 @@ class Command(BaseCommand):
 
 
     def sharesansar_scraper(self):
+        print('ss call')
         stocks = []
         base_url = "https://www.sharesansar.com/live-trading"
 
@@ -102,6 +120,7 @@ class Command(BaseCommand):
                     )
 
     def chukul_scraper(self):
+
         base_url = 'https://chukul.com/api/data/v2/market-summary/?type=stock'
         data = requests.get(base_url).json()
         for stock_data in data:
@@ -109,6 +128,7 @@ class Command(BaseCommand):
             try:
                 Stock.objects.update_or_create(
                     symbol=stock_data["symbol"],
+                    date = timezone.now().date(),
                     defaults={
                         "ltp": (stock_data["close"]),
                         "point_change": (stock_data["point_change"]),
@@ -131,6 +151,17 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        self.sharesansar_scraper()
-
+        next_scraper = self.get_next_scraper()
+        
+        try:
+            if next_scraper == 'sharesansar':
+                self.stdout.write(self.style.SUCCESS("Running Sharesansar scraper..."))
+                self.sharesansar_scraper()
+            else:
+                self.stdout.write(self.style.SUCCESS("Running Chukul scraper..."))
+                self.chukul_scraper()
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(f"Error in {next_scraper} scraper: {str(e)}")
+            )
     
