@@ -140,6 +140,7 @@ class Command(BaseCommand):
                         "low_price": (stock_data["low"]),
                         "volume": (stock_data["volume"]),
                         "prev_close": (stock_data["prev_close"]),
+                        "sector": (stock_sector_map.get(stock_data["symbol"].upper(), "N/A")).upper(),
                     },
                 )
             except ValidationError as e:
